@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>APEX.FIT | Premium Workout Tracker</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    brand: {
+                        500: '#6366f1',
+                        600: '#4f46e5'
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    body {
+        font-family: 'Inter', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .glass {
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .light .glass {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    input {
+        min-width: 0;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 20px;
+    }
+
+    .nav-btn {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 16px;
+        text-align: left;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .primary-btn {
+        background: #6366f1;
+        color: #ffffff;
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .primary-btn:hover {
+        background: #4f46e5;
+    }
+
+    .secondary-btn {
+        background: #1e293b;
+        color: #f8fafc;
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+    .light .secondary-btn {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+</style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen pb-24 md:pb-0">
+
+<div class="flex min-h-screen">
+
+    <!-- Desktop Sidebar Sidebar -->
+    <aside class="hidden md:flex flex-col w-64 glass p-6 fixed h-full justify-between z-40">
+        <div>
+            <div class="flex items-center gap-3 mb-8 px-2">
+                <i data-lucide="dumbbell" class="text-indigo-500 w-8 h-8"></i>
+                <h1 class="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+                    APEX.FIT
+                </h1>
+            </div>
+
+            <nav class="space-y-2">
+                <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-btn bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </button>
+
+                <button onclick="switchPage('history')" id="nav-history" class="nav-btn text-slate-400 hover:bg-slate-800/50 hover:text-white">
+                    <i data-lucide="history" class="w-5 h-5"></i>
+                    <span>History</span>
+                </button>
+
+                <button onclick="switchPage('settings')" id="nav-settings" class="nav-btn text-slate-400 hover:bg-slate-800/50 hover:text-white">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </div>
+
+        <button onclick="toggleTheme()" class="nav-btn text-slate-400 hover:bg-slate-800/50 hover:text-white mt-auto">
+            <i data-lucide="sun-moon" class="w-5 h-5"></i>
+            <span>Theme Toggle</span>
+        </button>
+    </aside>
+
+    <!-- Main Workspace Frame Container -->
+    <main class="flex-1 md:ml-64 p-4 md:p-8 w-full max-w-7xl mx-auto">
+
+        <!-- Section 1: Dashboard View -->
+        <section id="page-dashboard" class="block space-y-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-black tracking-tight">Workout Core</h2>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Real-time structured metric tracking system.</p>
+                </div>
+
+                <div class="glass rounded-2xl p-4 flex gap-8 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-indigo-500/10 rounded-xl text-indigo-500">
+                            <i data-lucide="layers" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Sets</p>
+                            <h3 id="totalSets" class="text-2xl font-bold tracking-tight">0</h3>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
+                            <i data-lucide="activity" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Volume</p>
+                            <h3 id="totalVolume" class="text-2xl font-bold tracking-tight">0kg</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Days Grid Pipeline Placement Entry Target -->
+            <div id="weekContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+        </section>
+
+        <!-- Section 2: Historical Metrics Log Explorer View -->
+        <section id="page-history" class="hidden space-y-6">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-black tracking-tight">Analytical History</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Deep historical audit of previous sets and completed volumes.</p>
+            </div>
+
+            <div class="relative max-w-md">
+                <i data-lucide="search" class="absolute left-4 top-1.5/2 top-3.5 text-slate-500 w-5 h-5"></i>
+                <input
+                    id="historySearch"
+                    type="text"
+                    placeholder="Search metrics or exercises..."
+                    class="w-full pl-12 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none shadow-sm text-sm transition-all"
+                    oninput="renderHistory()"
+                />
+            </div>
+
+            <div id="historyContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <!-- Section 3: Settings Panel & Data Utilities Engine -->
+        <section id="page-settings" class="hidden max-w-xl space-y-6">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-black tracking-tight">System Settings</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Manage application database storage parameters.</p>
+            </div>
+
+            <div class="glass rounded-2xl p-6 space-y-4 shadow-sm">
+                <h3 class="text-lg font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="database" class="w-5 h-5 text-indigo-500"></i>
+                    <span>Database Interoperability Portal</span>
+                </h3>
+                
+                <button onclick="exportData()" class="primary-btn w-full shadow-lg shadow-indigo-500/10">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Export App Schema (.json)</span>
+                </button>
+
+                <button onclick="document.getElementById('importFile').click()" class="secondary-btn w-full flex items-center justify-center gap-2 hover:bg-slate-800 transition-all">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span>Import App Schema File</span>
+                </button>
+
+                <input type="file" id="importFile" class="hidden" onchange="importData(event)" accept=".json" />
+
+                <div class="border-t border-slate-200 dark:border-slate-800 my-4 pt-4">
+                    <button onclick="clearAllData()" class="w-full bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/20 px-5 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Purge Core Database Permanently</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- Mobile Adaptive Screen Layout Control Bottom Navigation Dock -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-around items-center z-50 shadow-xl">
+    <button onclick="switchPage('dashboard')" id="mob-nav-dashboard" class="flex flex-col items-center gap-1 text-indigo-500 font-bold transition-all">
+        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+        <span class="text-[10px]">Dashboard</span>
+    </button>
+    <button onclick="switchPage('history')" id="mob-nav-history" class="flex flex-col items-center gap-1 text-slate-400 font-medium transition-all">
+        <i data-lucide="history" class="w-6 h-6"></i>
+        <span class="text-[10px]">History</span>
+    </button>
+    <button onclick="switchPage('settings')" id="mob-nav-settings" class="flex flex-col items-center gap-1 text-slate-400 font-medium transition-all">
+        <i data-lucide="settings" class="w-6 h-6"></i>
+        <span class="text-[10px]">Settings</span>
+    </button>
+    <button onclick="toggleTheme()" class="flex flex-col items-center gap-1 text-slate-400 font-medium transition-all">
+        <i data-lucide="sun-moon" class="w-6 h-6"></i>
+        <span class="text-[10px]">Theme</span>
+    </button>
+</nav>
+
+<script>
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+// Core Intercept Engine Storage State Database Initialization
+let workouts = {};
+
+try {
+    workouts = JSON.parse(localStorage.getItem('premium_workouts')) || {};
+} catch(err) {
+    workouts = {};
+}
+
+// Persist engine and recount all parameters concurrently
+function saveWorkouts() {
+    localStorage.setItem('premium_workouts', JSON.stringify(workouts));
+    calculateStats();
+}
+
+function getWeekDates() {
+    const current = new Date();
+    const day = current.getDay();
+    // Anchor target layout matching international standard calibration
+    const mondayOffset = current.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(current.setDate(mondayOffset));
+
+    const dates = [];
+    for(let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        dates.push({
+            name: DAYS[i],
+            date: d.toISOString().split('T')[0]
+        });
+    }
+    return dates;
+}
+
+// Master Client UI Pipeline Core View Controller Render Dashboard Engine Loop
+function renderDashboard() {
+    const container = document.getElementById('weekContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    getWeekDates().forEach(day => {
+        const exercises = Object.values(workouts[day.date] || {});
+        let exerciseHTML = '';
+
+        if(exercises.length === 0) {
+            exerciseHTML = `
+                <div class="flex flex-col items-center justify-center p-8 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl bg-slate-900/5 dark:bg-slate-900/20 min-h-[140px]">
+                    <span class="text-2xl mb-1">😴</span>
+                    <h4 class="text-sm font-bold text-slate-400">Scheduled Recovery Session</h4>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">No exercises added for this calendar node block.</p>
+                </div>
+            `;
+        } else {
+            exercises.forEach(exercise => {
+                let setsHTML = '';
+
+                exercise.sets.forEach((set, index) => {
+                    setsHTML += `
+                        <div class="grid grid-cols-12 gap-2 items-center mt-2 bg-slate-900/10 dark:bg-slate-900/40 p-1.5 rounded-xl border border-slate-200/50 dark:border-slate-800/40">
+                            <div class="col-span-2 text-center text-xs font-black bg-slate-200 dark:bg-slate-800 py-2 rounded-lg text-slate-600 dark:text-slate-400">
+                                S${index + 1}
+                            </div>
+
+                            <div class="col-span-4 relative flex items-center">
+                                <input
+                                    type="number"
+                                    value="${set.reps}"
+                                    placeholder="0"
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-1.5 text-center text-sm font-semibold focus:border-indigo-500 outline-none pr-7"
+                                    oninput="updateSet('${day.date}','${exercise.id}',${index},'reps',this.value)"
+                                />
+                                <span class="absolute right-2 text-[10px] uppercase tracking-wider text-slate-400 font-bold pointer-events-none">R</span>
+                            </div>
+
+                            <div class="col-span-4 relative flex items-center">
+                                <input
+                                    type="number"
+                                    value="${set.weight}"
+                                    placeholder="0"
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-1.5 text-center text-sm font-semibold focus:border-indigo-500 outline-none pr-9"
+                                    oninput="updateSet('${day.date}','${exercise.id}',${index},'weight',this.value)"
+                                />
+                                <span class="absolute right-2 text-[10px] uppercase tracking-wider text-slate-400 font-bold pointer-events-none">KG</span>
+                            </div>
+
+                            <button
+                                onclick="deleteSet('${day.date}','${exercise.id}',${index})"
+                                class="col-span-2 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-lg py-2 text-xs font-bold transition-all flex items-center justify-center"
+                                title="Delete Set"
+                            >
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+
+                exerciseHTML += `
+                    <div class="bg-white/50 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm relative group">
+                        <div class="flex justify-between items-center mb-3 gap-3">
+                            <div class="flex items-center gap-2 flex-1">
+                                <i data-lucide="dumbbell" class="w-4 h-4 text-indigo-400 flex-shrink-0"></i>
+                                <input
+                                    value="${exercise.name}"
+                                    placeholder="Add Exercise Name..."
+                                    oninput="updateExerciseName('${day.date}','${exercise.id}',this.value)"
+                                    class="bg-transparent text-base font-bold outline-none flex-1 placeholder-slate-400 dark:placeholder-slate-600 focus:border-b border-indigo-500 py-0.5"
+                                />
+                            </div>
+
+                            <button
+                                onclick="deleteExercise('${day.date}','${exercise.id}')"
+                                class="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-500/10 transition-all flex items-center justify-center"
+                                title="Delete Exercise"
+                            >
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        ${exercise.sets.length > 0 ? `
+                        <div class="grid grid-cols-12 gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 px-1">
+                            <div class="col-span-2 text-center">Set</div>
+                            <div class="col-span-4 text-center">Reps</div>
+                            <div class="col-span-4 text-center">Weight</div>
+                            <div class="col-span-2"></div>
+                        </div>
+                        ` : ''}
+
+                        <div class="space-y-1">${setsHTML}</div>
+
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t border-slate-200/50 dark:border-slate-800/60">
+                            <button
+                                onclick="addSet('${day.date}','${exercise.id}')"
+                                class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500 text-indigo-500 hover:text-white font-bold text-xs transition-all"
+                            >
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Add Set</span>
+                            </button>
+
+                            <button
+                                onclick="copyLastSet('${day.date}','${exercise.id}')"
+                                class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition-all ${exercise.sets.length === 0 ? 'opacity-40 cursor-not-allowed' : ''}"
+                                ${exercise.sets.length === 0 ? 'disabled' : ''}
+                            >
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                <span>Copy Last</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        const dayWrapperHTML = `
+            <div class="glass rounded-3xl p-5 flex flex-col justify-between shadow-sm border border-slate-200 dark:border-slate-800">
+                <div>
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200/60 dark:border-slate-800/60">
+                        <div>
+                            <h3 class="text-xl font-black tracking-tight">${day.name}</h3>
+                            <p class="text-slate-400 text-xs font-medium mt-0.5">
+                                ${new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                        </div>
+
+                        <button
+                            onclick="addExercise('${day.date}')"
+                            class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl px-3.5 py-2 font-bold text-xs tracking-wide flex items-center gap-1.5 shadow-md shadow-indigo-500/10 transition-all"
+                        >
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Exercise</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4 max-h-[480px] overflow-y-auto pr-1">${exerciseHTML}</div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML += dayWrapperHTML;
+    });
+
+    lucide.createIcons();
+}
+
+function addExercise(date) {
+    if(!workouts[date]) {
+        workouts[date] = {};
+    }
+
+    const id = 'ex_' + Date.now() + Math.random().toString(36).substr(2, 4);
+
+    workouts[date][id] = {
+        id,
+        name: '',
+        notes: '',
+        sets: [{ reps: '', weight: '' }] // Seed with primary structural set block natively
+    };
+
+    saveWorkouts();
+    renderDashboard();
+}
+
+function updateExerciseName(date, id, value) {
+    if(workouts?.[date]?.[id]) {
+        workouts[date][id].name = value;
+        // Non-destructive memory loop cache write to guard against focus breakdown resetting
+        localStorage.setItem('premium_workouts', JSON.stringify(workouts));
+    }
+}
+
+function addSet(date, id) {
+    const exercise = workouts?.[date]?.[id];
+    if(!exercise) return;
+
+    exercise.sets.push({
+        reps: '',
+        weight: ''
+    });
+
+    saveWorkouts();
+    renderDashboard();
+}
+
+function updateSet(date, id, index, field, value) {
+    const set = workouts?.[date]?.[id]?.sets?.[index];
+    if(!set) return;
+
+    set[field] = value;
+    
+    // Direct operational live writing block protection scheme tracking configuration updates
+    localStorage.setItem('premium_workouts', JSON.stringify(workouts));
+    calculateStats();
+}
+
+function deleteExercise(date, id) {
+    if(confirm('Purge structural data profile block for this exercise?')) {
+        delete workouts[date][id];
+        saveWorkouts();
+        renderDashboard();
+    }
+}
+
+function deleteSet(date, id, index) {
+    if(workouts?.[date]?.[id]?.sets) {
+        workouts[date][id].sets.splice(index, 1);
+        saveWorkouts();
+        renderDashboard();
+    }
+}
+
+function copyLastSet(date, id) {
+    const exercise = workouts?.[date]?.[id];
+    if(!exercise || exercise.sets.length === 0) return;
+
+    const lastSet = exercise.sets[exercise.sets.length - 1];
+
+    exercise.sets.push({
+        reps: lastSet.reps,
+        weight: lastSet.weight
+    });
+
+    saveWorkouts();
+    renderDashboard();
+}
+
+function calculateStats() {
+    let totalSets = 0;
+    let totalVolume = 0;
+
+    Object.values(workouts).forEach(day => {
+        if (!day) return;
+        Object.values(day).forEach(exercise => {
+            if (!exercise || !exercise.sets) return;
+            totalSets += exercise.sets.length;
+            exercise.sets.forEach(set => {
+                const r = Number(set.reps) || 0;
+                const w = Number(set.weight) || 0;
+                totalVolume += r * w;
+            });
+        });
+    });
+
+    const setsElement = document.getElementById('totalSets');
+    const volElement = document.getElementById('totalVolume');
+    
+    if(setsElement) setsElement.innerText = totalSets;
+    if(volElement) volElement.innerText = totalVolume.toLocaleString() + 'kg';
+}
+
+function renderHistory() {
+    const container = document.getElementById('historyContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const search = (document.getElementById('historySearch')?.value || '').toLowerCase();
+    const sortedDates = Object.keys(workouts).sort((a, b) => new Date(b) - new Date(a));
+
+    let visibleCards = 0;
+
+    sortedDates.forEach(date => {
+        if (!workouts[date]) return;
+        const exercises = Object.values(workouts[date]);
+        const filtered = exercises.filter(ex => ex && ex.name.toLowerCase().includes(search));
+
+        if(search && filtered.length === 0) return;
+        
+        // Render targeting loop sequence matching active array content context filter
+        const targetExercises = search ? filtered : exercises;
+        if(targetExercises.length === 0) return;
+
+        let exerciseListHTML = '';
+
+        targetExercises.forEach(ex => {
+            let setsBreakdownHTML = '';
+            
+            if(ex.sets && ex.sets.length > 0) {
+                setsBreakdownHTML = `
+                    <div class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs text-slate-400">
+                        ${ex.sets.map((s, idx) => `
+                            <div class="bg-slate-950/40 p-1.5 rounded border border-slate-800/40">
+                                <span class="text-indigo-400 font-bold">S${idx + 1}:</span> ${s.reps || 0} reps @ ${s.weight || 0}kg
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            exerciseListHTML += `
+                <div class="bg-slate-50 dark:bg-slate-950/60 rounded-xl p-3.5 border border-slate-200 dark:border-slate-900/60 shadow-inner">
+                    <div class="flex justify-between items-center">
+                        <div class="font-bold text-sm text-slate-800 dark:text-slate-200">${ex.name || 'Unnamed Structural Movement'}</div>
+                        <div class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 bg-indigo-500/10 text-indigo-400 rounded-full">
+                            ${ex.sets ? ex.sets.length : 0} Sets Loaded
+                        </div>
+                    </div>
+                    ${setsBreakdownHTML}
+                </div>
+            `;
+        });
+
+        visibleCards++;
+        container.innerHTML += `
+            <div class="glass rounded-3xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+                        <i data-lucide="calendar" class="w-4 h-4 text-indigo-400"></i>
+                        <h3 class="text-base font-black tracking-tight text-slate-700 dark:text-slate-300">
+                            ${new Date(date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                        </h3>
+                    </div>
+                    <div class="space-y-3">${exerciseListHTML}</div>
+                </div>
+            </div>
+        `;
+    });
+
+    if (visibleCards === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12 glass rounded-3xl border border-dashed border-slate-800">
+                <i data-lucide="folder-open" class="w-10 h-10 text-slate-600 mx-auto mb-2"></i>
+                <p class="text-sm text-slate-400 font-medium">No tracking entries found matching query index.</p>
+            </div>
+        `;
+    }
+
+    lucide.createIcons();
+}
+
+function switchPage(page) {
+    ['dashboard', 'history', 'settings'].forEach(p => {
+        const section = document.getElementById(`page-${p}`);
+        const desktopBtn = document.getElementById(`nav-${p}`);
+        const mobileBtn = document.getElementById(`mob-nav-${p}`);
+
+        if (section) {
+            if (p === page) {
+                section.style.display = 'block';
+                
+                // Desktop navigation state highlights adjustments
+                if(desktopBtn) {
+                    desktopBtn.className = "nav-btn bg-indigo-600 text-white shadow-lg shadow-indigo-500/20";
+                }
+                // Mobile navigation state highlights adjustments
+                if(mobileBtn) {
+                    mobileBtn.className = "flex flex-col items-center gap-1 text-indigo-500 font-bold transition-all";
+                }
+            } else {
+                section.style.display = 'none';
+                
+                if(desktopBtn) {
+                    desktopBtn.className = "nav-btn text-slate-400 hover:bg-slate-800/50 hover:text-white";
+                }
+                if(mobileBtn) {
+                    mobileBtn.className = "flex flex-col items-center gap-1 text-slate-400 font-medium transition-all";
+                }
+            }
+        }
+    });
+
+    if (page === 'history') {
+        renderHistory();
+    } else if (page === 'dashboard') {
+        renderDashboard();
+    }
+    lucide.createIcons();
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    if(html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+    } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+function exportData() {
+    if(Object.keys(workouts).length === 0) {
+        alert("Local tracking state empty. Aborting compile file command lifecycle.");
+        return;
+    }
+    const data = JSON.stringify(workouts, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `apex-fit-core-schema-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            
+            // Structural layout schema validation execution check
+            if (typeof parsed === 'object' && parsed !== null) {
+                workouts = parsed;
+                saveWorkouts();
+                renderDashboard();
+                alert('Schema integration success: Application state synced safely.');
+                switchPage('dashboard');
+            } else {
+                throw new Error("Invalid object notation matrix context.");
+            }
+        } catch(err) {
+            alert('File processing rejected: Invalid database asset profile compilation.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function clearAllData() {
+    if (confirm('CRITICAL ACTION WARNING: Delete local database state entries and all log volumes permanently?')) {
+        workouts = {};
+        localStorage.removeItem('premium_workouts');
+        renderDashboard();
+        renderHistory();
+        calculateStats();
+        alert('Data purged cleanly.');
+    }
+}
+
+// Runtime Startup Handshake Engine Core
+(function init() {
+    const activeTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(activeTheme);
+
+    renderDashboard();
+    calculateStats();
+    lucide.createIcons();
+})();
+</script>
+</body>
+</html>
